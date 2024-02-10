@@ -1,0 +1,23 @@
+import asyncio
+import aiohttp
+
+async def fetch_content(url, session):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def main(urls):
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_content(url, session) for url in urls]
+        return await asyncio.gather(*tasks)
+
+if __name__ == "__main__":
+    urls = [
+        'http://example.com',
+        'http://example.org',
+        'http://example.net',
+        # Add more URLs as needed
+    ]
+    results = asyncio.run(main(urls))
+    for result in results:
+        # Process the result
+        print(result[:100])  # Print the first 100 characters of each fetched content
