@@ -1,0 +1,49 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Mock database
+MOCK_DATABASE = {
+    '1': {'task': 'Build an API'},
+    '2': {'task': '????'},
+    '3': {'task': 'Profit'},
+}
+
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    return jsonify(MOCK_DATABASE)
+
+@app.route('/tasks/<id>', methods=['GET'])
+def get_task(id):
+    task = MOCK_DATABASE.get(id)
+    if task:
+        return jsonify(task)
+    else:
+        return jsonify({'error': 'task not found'}), 404
+
+@app.route('/tasks', methods=['POST'])
+def create_task():
+    task_data = request.json
+    new_id = str(len(MOCK_DATABASE) + 1)
+    MOCK_DATABASE[new_id] = task_data
+    return jsonify(MOCK_DATABASE[new_id]), 201
+
+@app.route('/tasks/<id>', methods=['PUT'])
+def update_task(id):
+    task_data = request.json
+    if id in MOCK_DATABASE:
+        MOCK_DATABASE[id] = task_data
+        return jsonify(task_data)
+    else:
+        return jsonify({'error': 'task not found'}), 404
+
+@app.route('/tasks/<id>', methods=['DELETE'])
+def delete_task(id):
+    if id in MOCK_DATABASE:
+        del MOCK_DATABASE[id]
+        return jsonify({'success': 'task deleted'}), 200
+    else:
+        return jsonify({'error': 'task not found'}), 404
+
+if __name__ == "__main__":
+    app.run(debug=True)
